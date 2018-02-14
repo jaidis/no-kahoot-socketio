@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>No-Kahoot</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/f738c7a0bf.css">
+  <link rel="stylesheet" href="main.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row bg-dark">
+      <div class="col-12 text-center text-white my-2">
+        <h1>No-Kahoot</h1>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid bg-info pt-5 contenedor">
+    <div class="row" id="nick">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4 bg-warning">
+        <form>
+          <div class="form-group my-2">
+            <label for="nickname">Introduce un nombre de usuario</label>
+            <input type="text" class="form-control" id="nickname" aria-describedby="nickHelp" placeholder="Nombre..." autocomplete="off">
+            <small id="nickHelp" class="form-text text-muted">Utiliza el nick que quieras</small>
+          </div>
+          <div class="form-group my-2">
+            <label for="room">Introduce un nombre de sala</label>
+            <input type="text" class="form-control" id="room" aria-describedby="roomHelp" placeholder="Sala..." autocomplete="off" autocapitalize="off">
+            <small id="nickHelp" class="form-text text-muted">Prueba con algún nombre, quizás te lleves una sorpresa...</small>
+          </div>
+          <button type="button" class="btn btn-primary btn-block mb-3" id="buttonUsuarios">Enviar</button>
+        </form>
+      </div>
+    </div>
+    <div class="row text-center" id="esperando">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4 text-light">
+        <div class="alert alert-danger mb-3 py-4" role="alert">
+          <h4>Esperando a otros jugadores...</h4>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="confirmar">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
+        <div class="alert alert-warning" role="alert">
+          <h4 class="alert-heading text-center">¡Atención!</h4>
+          <p>El No-Kahoot va a empezar, si fallas, ¡Estás muerto! <strong>(o quizás no, pero por si acaso yo te aviso)</strong></p>
+          <p class="mb-0">¡Si necesitas ir al baño antes de pulsar en confirmar ve ahora!</p>
+          <hr class="instrucciones">
+          <h4 class="alert-heading text-center">Reglas</h4>
+          <p>Las reglas son sencillas</p>
+          <ul class="list-group list-group-flush text-center">
+            <li class="list-group-item list-group-item-success">Tendrás una pregunta con 4 posibles respuestas, solo una de ella es verdadera</li>
+            <li class="list-group-item list-group-item-danger">Por cada pregunta incorrecta se resta 2 puntos</li>
+            <li class="list-group-item list-group-item-success">Por cada pregunta acertada se suma 3 puntos</li>
+            <li class="list-group-item list-group-item-danger">Contesta antes de que se acabe el tiempo, de lo contrario no se sumarán puntos</li>
+            <li class="list-group-item list-group-item-primary">Al finalizar el juego se mostrará tu puntuación y el ganador de la partida</li>
+          </ul>
+        </div>
+        <button type="submit" class="btn btn-warning btn-block btn-lg mb-3" id="buttonConfirmar">Confirmar</button>
+      </div>
+    </div>
+    <div class="row text-white text-center" id="jugar">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
+        <div class="jumbotron bg-dark">
+          <h1 class="display-4" id="numero">Pregunta </h1>
+          <hr class="my-4 jumbo">
+          <p class="lead pt-2" id="pregunta"></p>
+          <hr class="my-4 jumbo">
+          <button class="btn btn-primary btn-lg btn-block" type="button" id='Button1' data-respuesta=""></button>
+          <button class="btn btn-danger btn-lg btn-block" type="button" id='Button2' data-respuesta=""></button>
+          <button class="btn btn-success btn-lg btn-block" type="button" id='Button3' data-respuesta=""></button>
+          <button class="btn btn-warning text-white btn-block btn-lg" type="button" id='Button4' data-respuesta=""></button>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center" id="terminando">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4 text-light">
+        <div class="alert alert-danger mb-3 py-4" role="alert">
+          <h4>Esperando a que terminen otros jugadores...</h4>
+        </div>
+      </div>
+    </div>
+    <div class="row text-center" id="ganador">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
+        <div class="alert alert-warning" role="alert">
+          <h4 class="alert-heading text-center">Puntuaciones</h4>
+          <p>A continuación se muestran las puntuaciones de los jugadores</p>
+          <hr class="instrucciones">
+          <h4 class="alert-heading text-center">Ganador</h4>
+          <p>Y el ganador de la ronda es <strong id="nGanador"></strong></p>
+          <p>Con una puntuación de: <strong id="pGanador"></strong></p>
+          <hr class="instrucciones">
+          <h4 class="alert-heading text-center">Perdedor</h4>
+          <p>Y el perdedor de la ronda es <strong id="nPerdedor"></strong></p>
+          <p>Con una puntuación de: <strong id="pPerdedor"></strong></p>
+        </div>
+        <button type="submit" class="btn btn-warning btn-block btn-lg mb-3" id="buttonCerrar">Salir</button>
+      </div>
+    </div>
+    <div class="row" id="chatSala">
+      <div class="offset-1 col-10 offset-md-3 col-md-6 offset-lg-4 col-lg-4">
+        <div class="col-12 mb-2 px-0">
+          <ul class="cajaMensajes bg-info">
+          </ul>
+        </div>
+        <div class="col-12 px-0 mb-4">
+          <form action="#">
+            <div class="form-group mb-3">
+              <input type="text" class="form-control" id="mensajeSala" placeholder="Escribe...." autocomplete="off">
+            </div>
+            <button type="button" class="btn btn-danger btn-block" id="buttonEnviar"><i class="fa fa-paper-plane fa-2x"></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="main.js" charset="utf-8"></script>
+</body>
+
+</html>

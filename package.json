@@ -1,0 +1,21 @@
+{
+  "name": "No-Kahoot",
+  "version": "0.7.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/servidor.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+       "node": "9.5.0",
+       "npm": "5.6.0"
+   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  }
+}
