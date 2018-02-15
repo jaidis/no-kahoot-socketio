@@ -147,6 +147,7 @@ io.on('connection', (socket) => {
         // console.log(datos.sala);
         confirmado++
         // console.log('Confirmado ' + confirmado);
+        acabado = 0;
         if (confirmado >= 2) {
           console.log('Ya se puede jugar en la Sala: ' + datos.sala);
           io.to(datos.sala).emit('jugar', true);
@@ -245,6 +246,7 @@ io.on('connection', (socket) => {
         }
       }
       confirmado = 0;
+      acabado = 0;
     });
 
     //Detección de usuario desconectado
@@ -257,6 +259,7 @@ io.on('connection', (socket) => {
         }
       }
       confirmado = 0;
+      acabado = 0;
       if (habitacion.length == 1) {
         console.log('Esperando más jugadores');
         io.to(datos.sala).emit('esperarJuego', false);
@@ -271,5 +274,5 @@ io.on('connection', (socket) => {
 // });
 
 server.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
+    console.log(`Servidor corriendo en el puerto ${port}`);
 });
